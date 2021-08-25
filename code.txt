@@ -1,0 +1,53 @@
+/* Query 1 - query used for first insight */
+
+select full_name, actorid,count(*)
+from(
+select a.first_name ||' '||a.last_name as full_name,a.actor_id actorid,f.title,f.description,f.length
+from actor a
+join film_actor fa 
+on a.actor_id=fa.actor_id
+join film f
+on fa.film_id=f.film_id
+ 
+  )sub 
+  group by 1,2 
+  order by 3 DESC
+  limit 1;
+
+/* Query 2 */
+
+select title,length from film 
+order by length DESC
+
+
+/* Query 3 */
+
+
+SELECT    DISTINCT(filmlen_groups),
+          COUNT(title) OVER (PARTITION BY filmlen_groups) AS filmcount_bylencat
+FROM  
+         (SELECT title,length,
+          CASE WHEN length <= 60 THEN '1 hour or less'
+          WHEN length > 60 AND length <= 120 THEN 'Between 1-2 hours'
+          WHEN length > 120 AND length <= 180 THEN 'Between 2-3 hours'
+          ELSE 'More than 3 hours' END AS filmlen_groups
+          FROM film ) t1
+ORDER BY  filmlen_groups;
+
+
+/* Query 4  */
+select cat_name,count(*)
+from(
+  select c.name as cat_name ,c.category_id
+  from  category c
+  join film_category f
+  on c.category_id=f.category_id
+  join film fi
+  on fi.film_id=f.film_id
+  join film_actor fa
+  on fa.film_id=f.film_id
+  join actor a
+  on a.actor_id=fa.actor_id
+  )sub
+  group by 1
+  order by 2 DESC
